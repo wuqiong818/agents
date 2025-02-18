@@ -19,6 +19,7 @@ from typing import (
 from livekit import rtc
 
 from .. import metrics, stt, tokenize, tts, utils, vad
+from .. import tts as text_to_speech
 from ..llm import LLM, ChatContext, ChatMessage, FunctionContext, LLMStream
 from ..types import ATTRIBUTE_AGENT_STATE, AgentState
 from .agent_output import AgentOutput, SpeechSource, SynthesisHandle
@@ -261,12 +262,9 @@ class VoicePipelineAgent(utils.EventEmitter[EventTypes]):
         # wrap with StreamAdapter automatically when streaming is not supported on a specific TTS/STT.
         # To override StreamAdapter options, create the adapter manually.
 
-        if not tts.capabilities.streaming:
-            from .. import tts as text_to_speech
-
-            tts = text_to_speech.StreamAdapter(
-                tts=tts, sentence_tokenizer=tokenize.basic.SentenceTokenizer()
-            )
+        tts = text_to_speech.StreamAdapter(
+            tts=tts, sentence_tokenizer=tokenize.basic.SentenceTokenizer()
+        )
 
         if not stt.capabilities.streaming:
             from .. import stt as speech_to_text
